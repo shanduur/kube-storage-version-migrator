@@ -24,6 +24,12 @@ import (
 // +genclient
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 // +genclient:nonNamespaced
+// +kubebuilder:object:root=true
+// +kubebuilder:subresource:status
+// +kubebuilder:resource:scope=Cluster
+// +kubebuilder:printcolumn:name="Group",type="string",JSONPath=".spec.resource.group"
+// +kubebuilder:printcolumn:name="Resource",type="string",JSONPath=".spec.resource.resource"
+// +kubebuilder:printcolumn:name="Status",type="string",JSONPath=".status.conditions[0].type"
 
 // StorageVersionMigration represents a migration of stored data to the latest
 // storage version.
@@ -116,6 +122,9 @@ type StorageVersionMigrationList struct {
 // +genclient
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 // +genclient:nonNamespaced
+// +kubebuilder:object:root=true
+// +kubebuilder:subresource:status
+// +kubebuilder:resource:scope=Cluster
 
 // The state of the storage of a specific resource.
 type StorageState struct {

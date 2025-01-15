@@ -20,10 +20,14 @@ set -o pipefail
 
 SCRIPT_ROOT=$(dirname "${BASH_SOURCE[0]}")/..
 CODEGEN_PKG=${CODEGEN_PKG:-$(cd "${SCRIPT_ROOT}"; ls -d -1 ./vendor/k8s.io/code-generator 2>/dev/null || echo ../code-generator)}
+CONTROLLER_GEN="go run -mod=vendor ${SCRIPT_ROOT}/vendor/sigs.k8s.io/controller-tools/cmd/controller-gen"
 
 source "${CODEGEN_PKG}/kube_codegen.sh"
 
 THIS_PKG="sigs.k8s.io/kube-storage-version-migrator"
+
+echo "Generating CRDs"
+${CONTROLLER_GEN} crd paths="./..." output:crd:artifacts:config=manifests/crds
 
 kube::codegen::gen_helpers \
     --boilerplate "${SCRIPT_ROOT}/hack/boilerplate.go.txt" \

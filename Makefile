@@ -43,7 +43,7 @@ e2e-test:
 .PHONY: local-manifests
 local-manifests:
 	mkdir -p manifests.local
-	cp manifests/* manifests.local/
+	cp -r manifests/* manifests.local/
 	find ./manifests.local -type f -exec sed -i -e "s|REGISTRY|$(REGISTRY)|g" {} \;
 	find ./manifests.local -type f -exec sed -i -e "s|VERSION|$(VERSION)|g" {} \;
 	find ./manifests.local -type f -exec sed -i -e "s|NAMESPACE|$(NAMESPACE)|g" {} \;
