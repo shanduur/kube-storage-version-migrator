@@ -18,6 +18,8 @@ spec:
       containers:
       - name: trigger
         image: REGISTRY/storage-version-migration-trigger:VERSION
+        args:
+          - --v=2
         livenessProbe:
           httpGet:
             scheme: HTTP

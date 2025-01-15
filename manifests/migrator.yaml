@@ -19,6 +19,7 @@ spec:
       - name: migrator
         image: REGISTRY/storage-version-migration-migrator:VERSION
         args:
+          - --v=2
           - --kube-api-qps=40
           - --kube-api-burst=1000
         livenessProbe:

@@ -9,5 +9,7 @@ spec:
       containers:
       - name: initializer
         image: REGISTRY/storage-version-migration-initializer:VERSION
+        args:
+        - --v=2
       restartPolicy: Never
   backoffLimit: 4
