@@ -19,24 +19,24 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"context"
+	context "context"
 	time "time"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	watch "k8s.io/apimachinery/pkg/watch"
 	cache "k8s.io/client-go/tools/cache"
-	migrationv1alpha1 "sigs.k8s.io/kube-storage-version-migrator/pkg/apis/migration/v1alpha1"
-	clientset "sigs.k8s.io/kube-storage-version-migrator/pkg/clients/clientset"
-	internalinterfaces "sigs.k8s.io/kube-storage-version-migrator/pkg/clients/informer/internalinterfaces"
-	v1alpha1 "sigs.k8s.io/kube-storage-version-migrator/pkg/clients/lister/migration/v1alpha1"
+	apismigrationv1alpha1 "sigs.k8s.io/kube-storage-version-migrator/pkg/apis/migration/v1alpha1"
+	versioned "sigs.k8s.io/kube-storage-version-migrator/pkg/clients/clientset/versioned"
+	internalinterfaces "sigs.k8s.io/kube-storage-version-migrator/pkg/clients/informers/externalversions/internalinterfaces"
+	migrationv1alpha1 "sigs.k8s.io/kube-storage-version-migrator/pkg/clients/listers/migration/v1alpha1"
 )
 
 // StorageVersionMigrationInformer provides access to a shared informer and lister for
 // StorageVersionMigrations.
 type StorageVersionMigrationInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1alpha1.StorageVersionMigrationLister
+	Lister() migrationv1alpha1.StorageVersionMigrationLister
 }
 
 type storageVersionMigrationInformer struct {
@@ -47,14 +47,14 @@ type storageVersionMigrationInformer struct {
 // NewStorageVersionMigrationInformer constructs a new informer for StorageVersionMigration type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewStorageVersionMigrationInformer(client clientset.Interface, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+func NewStorageVersionMigrationInformer(client versioned.Interface, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
 	return NewFilteredStorageVersionMigrationInformer(client, resyncPeriod, indexers, nil)
 }
 
 // NewFilteredStorageVersionMigrationInformer constructs a new informer for StorageVersionMigration type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewFilteredStorageVersionMigrationInformer(client clientset.Interface, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
+func NewFilteredStorageVersionMigrationInformer(client versioned.Interface, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
 	return cache.NewSharedIndexInformer(
 		&cache.ListWatch{
 			ListFunc: func(options v1.ListOptions) (runtime.Object, error) {
@@ -70,20 +70,20 @@ func NewFilteredStorageVersionMigrationInformer(client clientset.Interface, resy
 				return client.MigrationV1alpha1().StorageVersionMigrations().Watch(context.TODO(), options)
 			},
 		},
-		&migrationv1alpha1.StorageVersionMigration{},
+		&apismigrationv1alpha1.StorageVersionMigration{},
 		resyncPeriod,
 		indexers,
 	)
 }
 
-func (f *storageVersionMigrationInformer) defaultInformer(client clientset.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
+func (f *storageVersionMigrationInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
 	return NewFilteredStorageVersionMigrationInformer(client, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
 }
 
 func (f *storageVersionMigrationInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&migrationv1alpha1.StorageVersionMigration{}, f.defaultInformer)
+	return f.factory.InformerFor(&apismigrationv1alpha1.StorageVersionMigration{}, f.defaultInformer)
 }
 
-func (f *storageVersionMigrationInformer) Lister() v1alpha1.StorageVersionMigrationLister {
-	return v1alpha1.NewStorageVersionMigrationLister(f.Informer().GetIndexer())
+func (f *storageVersionMigrationInformer) Lister() migrationv1alpha1.StorageVersionMigrationLister {
+	return migrationv1alpha1.NewStorageVersionMigrationLister(f.Informer().GetIndexer())
 }

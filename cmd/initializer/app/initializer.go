@@ -9,7 +9,7 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/component-base/cli/flag"
 	apiserviceclient "k8s.io/kube-aggregator/pkg/client/clientset_generated/clientset"
-	migrationclient "sigs.k8s.io/kube-storage-version-migrator/pkg/clients/clientset"
+	migrationclient "sigs.k8s.io/kube-storage-version-migrator/pkg/clients/clientset/versioned"
 	"sigs.k8s.io/kube-storage-version-migrator/pkg/initializer"
 	"sigs.k8s.io/kube-storage-version-migrator/pkg/version"
 )

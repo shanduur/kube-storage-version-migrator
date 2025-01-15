@@ -19,24 +19,24 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"context"
+	context "context"
 	time "time"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	watch "k8s.io/apimachinery/pkg/watch"
 	cache "k8s.io/client-go/tools/cache"
-	migrationv1alpha1 "sigs.k8s.io/kube-storage-version-migrator/pkg/apis/migration/v1alpha1"
-	clientset "sigs.k8s.io/kube-storage-version-migrator/pkg/clients/clientset"
-	internalinterfaces "sigs.k8s.io/kube-storage-version-migrator/pkg/clients/informer/internalinterfaces"
-	v1alpha1 "sigs.k8s.io/kube-storage-version-migrator/pkg/clients/lister/migration/v1alpha1"
+	apismigrationv1alpha1 "sigs.k8s.io/kube-storage-version-migrator/pkg/apis/migration/v1alpha1"
+	versioned "sigs.k8s.io/kube-storage-version-migrator/pkg/clients/clientset/versioned"
+	internalinterfaces "sigs.k8s.io/kube-storage-version-migrator/pkg/clients/informers/externalversions/internalinterfaces"
+	migrationv1alpha1 "sigs.k8s.io/kube-storage-version-migrator/pkg/clients/listers/migration/v1alpha1"
 )
 
 // StorageStateInformer provides access to a shared informer and lister for
 // StorageStates.
 type StorageStateInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1alpha1.StorageStateLister
+	Lister() migrationv1alpha1.StorageStateLister
 }
 
 type storageStateInformer struct {
@@ -47,14 +47,14 @@ type storageStateInformer struct {
 // NewStorageStateInformer constructs a new informer for StorageState type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewStorageStateInformer(client clientset.Interface, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+func NewStorageStateInformer(client versioned.Interface, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
 	return NewFilteredStorageStateInformer(client, resyncPeriod, indexers, nil)
 }
 
 // NewFilteredStorageStateInformer constructs a new informer for StorageState type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewFilteredStorageStateInformer(client clientset.Interface, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
+func NewFilteredStorageStateInformer(client versioned.Interface, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
 	return cache.NewSharedIndexInformer(
 		&cache.ListWatch{
 			ListFunc: func(options v1.ListOptions) (runtime.Object, error) {
@@ -70,20 +70,20 @@ func NewFilteredStorageStateInformer(client clientset.Interface, resyncPeriod ti
 				return client.MigrationV1alpha1().StorageStates().Watch(context.TODO(), options)
 			},
 		},
-		&migrationv1alpha1.StorageState{},
+		&apismigrationv1alpha1.StorageState{},
 		resyncPeriod,
 		indexers,
 	)
 }
 
-func (f *storageStateInformer) defaultInformer(client clientset.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
+func (f *storageStateInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
 	return NewFilteredStorageStateInformer(client, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
 }
 
 func (f *storageStateInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&migrationv1alpha1.StorageState{}, f.defaultInformer)
+	return f.factory.InformerFor(&apismigrationv1alpha1.StorageState{}, f.defaultInformer)
 }
 
-func (f *storageStateInformer) Lister() v1alpha1.StorageStateLister {
-	return v1alpha1.NewStorageStateLister(f.Informer().GetIndexer())
+func (f *storageStateInformer) Lister() migrationv1alpha1.StorageStateLister {
+	return migrationv1alpha1.NewStorageStateLister(f.Informer().GetIndexer())
 }

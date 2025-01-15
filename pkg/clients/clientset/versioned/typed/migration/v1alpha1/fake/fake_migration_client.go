@@ -21,7 +21,7 @@ package fake
 import (
 	rest "k8s.io/client-go/rest"
 	testing "k8s.io/client-go/testing"
-	v1alpha1 "sigs.k8s.io/kube-storage-version-migrator/pkg/clients/clientset/typed/migration/v1alpha1"
+	v1alpha1 "sigs.k8s.io/kube-storage-version-migrator/pkg/clients/clientset/versioned/typed/migration/v1alpha1"
 )
 
 type FakeMigrationV1alpha1 struct {
@@ -29,11 +29,11 @@ type FakeMigrationV1alpha1 struct {
 }
 
 func (c *FakeMigrationV1alpha1) StorageStates() v1alpha1.StorageStateInterface {
-	return &FakeStorageStates{c}
+	return newFakeStorageStates(c)
 }
 
 func (c *FakeMigrationV1alpha1) StorageVersionMigrations() v1alpha1.StorageVersionMigrationInterface {
-	return &FakeStorageVersionMigrations{c}
+	return newFakeStorageVersionMigrations(c)
 }
 
 // RESTClient returns a RESTClient that is used to communicate

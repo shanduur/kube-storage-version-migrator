@@ -34,7 +34,7 @@ import (
 	"k8s.io/client-go/tools/cache"
 
 	"sigs.k8s.io/kube-storage-version-migrator/pkg/apis/migration/v1alpha1"
-	"sigs.k8s.io/kube-storage-version-migrator/pkg/clients/clientset/fake"
+	"sigs.k8s.io/kube-storage-version-migrator/pkg/clients/clientset/versioned/fake"
 )
 
 func TestProcessDiscoveryResource(t *testing.T) {

@@ -24,7 +24,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/tools/cache"
 	migrationv1alpha1 "sigs.k8s.io/kube-storage-version-migrator/pkg/apis/migration/v1alpha1"
-	"sigs.k8s.io/kube-storage-version-migrator/pkg/clients/clientset/fake"
+	"sigs.k8s.io/kube-storage-version-migrator/pkg/clients/clientset/versioned/fake"
 )
 
 func newMigration(name string, conditionType migrationv1alpha1.MigrationConditionType) *migrationv1alpha1.StorageVersionMigration {

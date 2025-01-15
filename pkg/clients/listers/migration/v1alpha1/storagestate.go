@@ -19,10 +19,10 @@ limitations under the License.
 package v1alpha1
 
 import (
-	"k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/labels"
-	"k8s.io/client-go/tools/cache"
-	v1alpha1 "sigs.k8s.io/kube-storage-version-migrator/pkg/apis/migration/v1alpha1"
+	labels "k8s.io/apimachinery/pkg/labels"
+	listers "k8s.io/client-go/listers"
+	cache "k8s.io/client-go/tools/cache"
+	migrationv1alpha1 "sigs.k8s.io/kube-storage-version-migrator/pkg/apis/migration/v1alpha1"
 )
 
 // StorageStateLister helps list StorageStates.
@@ -30,39 +30,19 @@ import (
 type StorageStateLister interface {
 	// List lists all StorageStates in the indexer.
 	// Objects returned here must be treated as read-only.
-	List(selector labels.Selector) (ret []*v1alpha1.StorageState, err error)
+	List(selector labels.Selector) (ret []*migrationv1alpha1.StorageState, err error)
 	// Get retrieves the StorageState from the index for a given name.
 	// Objects returned here must be treated as read-only.
-	Get(name string) (*v1alpha1.StorageState, error)
+	Get(name string) (*migrationv1alpha1.StorageState, error)
 	StorageStateListerExpansion
 }
 
 // storageStateLister implements the StorageStateLister interface.
 type storageStateLister struct {
-	indexer cache.Indexer
+	listers.ResourceIndexer[*migrationv1alpha1.StorageState]
 }
 
 // NewStorageStateLister returns a new StorageStateLister.
 func NewStorageStateLister(indexer cache.Indexer) StorageStateLister {
-	return &storageStateLister{indexer: indexer}
-}
-
-// List lists all StorageStates in the indexer.
-func (s *storageStateLister) List(selector labels.Selector) (ret []*v1alpha1.StorageState, err error) {
-	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.StorageState))
-	})
-	return ret, err
-}
-
-// Get retrieves the StorageState from the index for a given name.
-func (s *storageStateLister) Get(name string) (*v1alpha1.StorageState, error) {
-	obj, exists, err := s.indexer.GetByKey(name)
-	if err != nil {
-		return nil, err
-	}
-	if !exists {
-		return nil, errors.NewNotFound(v1alpha1.Resource("storagestate"), name)
-	}
-	return obj.(*v1alpha1.StorageState), nil
+	return &storageStateLister{listers.New[*migrationv1alpha1.StorageState](indexer, migrationv1alpha1.Resource("storagestate"))}
 }

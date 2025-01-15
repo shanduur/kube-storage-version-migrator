@@ -31,7 +31,7 @@ import (
 	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
 	apiregistrationv1 "k8s.io/kube-aggregator/pkg/client/clientset_generated/clientset/typed/apiregistration/v1"
 	migrationv1alpha1 "sigs.k8s.io/kube-storage-version-migrator/pkg/apis/migration/v1alpha1"
-	"sigs.k8s.io/kube-storage-version-migrator/pkg/clients/clientset/typed/migration/v1alpha1"
+	"sigs.k8s.io/kube-storage-version-migrator/pkg/clients/clientset/versioned/typed/migration/v1alpha1"
 )
 
 type initializer struct {

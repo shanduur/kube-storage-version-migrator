@@ -22,8 +22,8 @@ import (
 
 	"k8s.io/client-go/tools/cache"
 	migration_v1alpha1 "sigs.k8s.io/kube-storage-version-migrator/pkg/apis/migration/v1alpha1"
-	migrationclient "sigs.k8s.io/kube-storage-version-migrator/pkg/clients/clientset"
-	migrationinformer "sigs.k8s.io/kube-storage-version-migrator/pkg/clients/informer/migration/v1alpha1"
+	migrationclient "sigs.k8s.io/kube-storage-version-migrator/pkg/clients/clientset/versioned"
+	migrationinformer "sigs.k8s.io/kube-storage-version-migrator/pkg/clients/informers/externalversions/migration/v1alpha1"
 )
 
 const (

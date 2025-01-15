@@ -24,15 +24,19 @@ import (
 	"k8s.io/client-go/discovery"
 	fakediscovery "k8s.io/client-go/discovery/fake"
 	"k8s.io/client-go/testing"
-	clientset "sigs.k8s.io/kube-storage-version-migrator/pkg/clients/clientset"
-	migrationv1alpha1 "sigs.k8s.io/kube-storage-version-migrator/pkg/clients/clientset/typed/migration/v1alpha1"
-	fakemigrationv1alpha1 "sigs.k8s.io/kube-storage-version-migrator/pkg/clients/clientset/typed/migration/v1alpha1/fake"
+	clientset "sigs.k8s.io/kube-storage-version-migrator/pkg/clients/clientset/versioned"
+	migrationv1alpha1 "sigs.k8s.io/kube-storage-version-migrator/pkg/clients/clientset/versioned/typed/migration/v1alpha1"
+	fakemigrationv1alpha1 "sigs.k8s.io/kube-storage-version-migrator/pkg/clients/clientset/versioned/typed/migration/v1alpha1/fake"
 )
 
 // NewSimpleClientset returns a clientset that will respond with the provided objects.
 // It's backed by a very simple object tracker that processes creates, updates and deletions as-is,
-// without applying any validations and/or defaults. It shouldn't be considered a replacement
+// without applying any field management, validations and/or defaults. It shouldn't be considered a replacement
 // for a real clientset and is mostly useful in simple unit tests.
+//
+// DEPRECATED: NewClientset replaces this with support for field management, which significantly improves
+// server side apply testing. NewClientset is only available when apply configurations are generated (e.g.
+// via --with-applyconfig).
 func NewSimpleClientset(objects ...runtime.Object) *Clientset {
 	o := testing.NewObjectTracker(scheme, codecs.UniversalDecoder())
 	for _, obj := range objects {

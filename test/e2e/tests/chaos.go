@@ -20,7 +20,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 	migrationv1alpha1 "sigs.k8s.io/kube-storage-version-migrator/pkg/apis/migration/v1alpha1"
-	migrationclient "sigs.k8s.io/kube-storage-version-migrator/pkg/clients/clientset"
+	migrationclient "sigs.k8s.io/kube-storage-version-migrator/pkg/clients/clientset/versioned"
 	"sigs.k8s.io/kube-storage-version-migrator/pkg/version"
 	"sigs.k8s.io/kube-storage-version-migrator/test/e2e/chaosmonkey"
 	"sigs.k8s.io/kube-storage-version-migrator/test/e2e/util"

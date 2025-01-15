@@ -30,7 +30,7 @@ import (
 	"k8s.io/client-go/tools/cache"
 	"k8s.io/klog/v2"
 	migrationv1alpha1 "sigs.k8s.io/kube-storage-version-migrator/pkg/apis/migration/v1alpha1"
-	migrationclient "sigs.k8s.io/kube-storage-version-migrator/pkg/clients/clientset"
+	migrationclient "sigs.k8s.io/kube-storage-version-migrator/pkg/clients/clientset/versioned"
 	"sigs.k8s.io/kube-storage-version-migrator/pkg/migrator"
 	"sigs.k8s.io/kube-storage-version-migrator/pkg/migrator/metrics"
 )

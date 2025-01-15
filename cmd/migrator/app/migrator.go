@@ -14,7 +14,7 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/component-base/cli/flag"
-	migrationclient "sigs.k8s.io/kube-storage-version-migrator/pkg/clients/clientset"
+	migrationclient "sigs.k8s.io/kube-storage-version-migrator/pkg/clients/clientset/versioned"
 	"sigs.k8s.io/kube-storage-version-migrator/pkg/controller"
 	"sigs.k8s.io/kube-storage-version-migrator/pkg/version"
 )

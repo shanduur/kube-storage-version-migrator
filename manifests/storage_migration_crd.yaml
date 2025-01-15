@@ -21,14 +21,25 @@ spec:
         status: {}
       schema:
         openAPIV3Schema:
-          description: StorageVersionMigration represents a migration of stored data to the latest storage version.
+          description: |-
+            StorageVersionMigration represents a migration of stored data to the latest
+            storage version.
           type: object
           properties:
             apiVersion:
-              description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+              description: |-
+                APIVersion defines the versioned schema of this representation of an object.
+                Servers should convert recognized schemas to the latest internal value, and
+                may reject unrecognized values.
+                More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
               type: string
             kind:
-              description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+              description: |-
+                Kind is a string value representing the REST resource this object represents.
+                Servers may infer this from the endpoint the client submits requests to.
+                Cannot be updated.
+                In CamelCase.
+                More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
               type: string
             metadata:
               type: object
@@ -39,10 +50,17 @@ spec:
                 - resource
               properties:
                 continueToken:
-                  description: The token used in the list options to get the next chunk of objects to migrate. When the .status.conditions indicates the migration is "Running", users can use this token to check the progress of the migration.
+                  description: |-
+                    The token used in the list options to get the next chunk of objects
+                    to migrate. When the .status.conditions indicates the migration is
+                    "Running", users can use this token to check the progress of the
+                    migration.
                   type: string
                 resource:
-                  description: The resource that is being migrated. The migrator sends requests to the endpoint serving the resource. Immutable.
+                  description: |-
+                    The resource that is being migrated. The migrator sends requests to
+                    the endpoint serving the resource.
+                    Immutable.
                   type: object
                   properties:
                     group:

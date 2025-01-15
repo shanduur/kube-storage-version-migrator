@@ -24,11 +24,11 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	cache "k8s.io/client-go/tools/cache"
-	clientset "sigs.k8s.io/kube-storage-version-migrator/pkg/clients/clientset"
+	versioned "sigs.k8s.io/kube-storage-version-migrator/pkg/clients/clientset/versioned"
 )
 
-// NewInformerFunc takes clientset.Interface and time.Duration to return a SharedIndexInformer.
-type NewInformerFunc func(clientset.Interface, time.Duration) cache.SharedIndexInformer
+// NewInformerFunc takes versioned.Interface and time.Duration to return a SharedIndexInformer.
+type NewInformerFunc func(versioned.Interface, time.Duration) cache.SharedIndexInformer
 
 // SharedInformerFactory a small interface to allow for adding an informer without an import cycle
 type SharedInformerFactory interface {

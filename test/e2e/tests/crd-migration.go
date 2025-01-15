@@ -13,7 +13,7 @@ import (
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/tools/clientcmd"
 	migrationv1alpha1 "sigs.k8s.io/kube-storage-version-migrator/pkg/apis/migration/v1alpha1"
-	migrationclient "sigs.k8s.io/kube-storage-version-migrator/pkg/clients/clientset"
+	migrationclient "sigs.k8s.io/kube-storage-version-migrator/pkg/clients/clientset/versioned"
 	"sigs.k8s.io/kube-storage-version-migrator/pkg/version"
 	"sigs.k8s.io/kube-storage-version-migrator/test/e2e/util"
 )
@@ -112,7 +112,7 @@ var _ = Describe("storage version migrator", func() {
 		}
 
 		By("Change the storage version of the CRD")
-        output, err := exec.Command("kubectl", "patch", "crd", "tests.migrationtest.k8s.io", "--type=json", `--patch=[{ "op": "replace", "path": "/spec/versions/0/storage", "value": false}, { "op": "replace", "path": "/spec/versions/1/storage", "value": true }]`).CombinedOutput()
+		output, err := exec.Command("kubectl", "patch", "crd", "tests.migrationtest.k8s.io", "--type=json", `--patch=[{ "op": "replace", "path": "/spec/versions/0/storage", "value": false}, { "op": "replace", "path": "/spec/versions/1/storage", "value": true }]`).CombinedOutput()
 		if err != nil {
 			util.Failf("%s", output)
 		}
