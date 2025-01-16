@@ -32,6 +32,7 @@ import (
 	apiregistrationv1 "k8s.io/kube-aggregator/pkg/client/clientset_generated/clientset/typed/apiregistration/v1"
 	migrationv1alpha1 "sigs.k8s.io/kube-storage-version-migrator/pkg/apis/migration/v1alpha1"
 	"sigs.k8s.io/kube-storage-version-migrator/pkg/clients/clientset/versioned/typed/migration/v1alpha1"
+	"sigs.k8s.io/yaml"
 )
 
 type initializer struct {
@@ -64,128 +65,138 @@ const (
 	listKind        = "StorageVersionMigrationList"
 )
 
+const approval = "https://github.com/kubernetes/enhancements/tree/master/keps/sig-api-machinery/2330-migrating-api-objects-to-latest-storage-version"
+const migrationCRDContent string = `
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.17.1
+  name: storageversionmigrations.migration.k8s.io
+spec:
+  group: migration.k8s.io
+  names:
+    kind: StorageVersionMigration
+    listKind: StorageVersionMigrationList
+    plural: storageversionmigrations
+    singular: storageversionmigration
+  scope: Cluster
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .spec.resource.group
+      name: Group
+      type: string
+    - jsonPath: .spec.resource.resource
+      name: Resource
+      type: string
+    - jsonPath: .status.conditions[0].type
+      name: Status
+      type: string
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: |-
+          StorageVersionMigration represents a migration of stored data to the latest
+          storage version.
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: Specification of the migration.
+            properties:
+              continueToken:
+                description: |-
+                  The token used in the list options to get the next chunk of objects
+                  to migrate. When the .status.conditions indicates the migration is
+                  "Running", users can use this token to check the progress of the
+                  migration.
+                type: string
+              resource:
+                description: |-
+                  The resource that is being migrated. The migrator sends requests to
+                  the endpoint serving the resource.
+                  Immutable.
+                properties:
+                  group:
+                    description: The name of the group.
+                    type: string
+                  resource:
+                    description: The name of the resource.
+                    type: string
+                  version:
+                    description: The name of the version.
+                    type: string
+                type: object
+            required:
+            - resource
+            type: object
+          status:
+            description: Status of the migration.
+            properties:
+              conditions:
+                description: The latest available observations of the migration's
+                  current state.
+                items:
+                  description: Describes the state of a migration at a certain point.
+                  properties:
+                    lastUpdateTime:
+                      description: The last time this condition was updated.
+                      format: date-time
+                      type: string
+                    message:
+                      description: A human readable message indicating details about
+                        the transition.
+                      type: string
+                    reason:
+                      description: The reason for the condition's last transition.
+                      type: string
+                    status:
+                      description: Status of the condition, one of True, False, Unknown.
+                      type: string
+                    type:
+                      description: Type of the condition.
+                      type: string
+                  required:
+                  - status
+                  - type
+                  type: object
+                type: array
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+`
+
 func migrationCRD() *v1.CustomResourceDefinition {
-	return &v1.CustomResourceDefinition{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: "storageversionmigrations.migration.k8s.io",
-			Annotations: map[string]string{
-				"api-approved.kubernetes.io": "https://github.com/kubernetes/community/pull/2524",
-			},
-		},
-		Spec: v1.CustomResourceDefinitionSpec{
-			Group: "migration.k8s.io",
-			Names: v1.CustomResourceDefinitionNames{
-				Plural:   pluralCRDName,
-				Singular: singularCRDName,
-				Kind:     kind,
-				ListKind: listKind,
-			},
-			Scope: v1.ClusterScoped,
-			Versions: []v1.CustomResourceDefinitionVersion{
-				{
-					Name:    "v1alpha1",
-					Served:  true,
-					Storage: true,
-					Subresources: &v1.CustomResourceSubresources{
-						Status: &v1.CustomResourceSubresourceStatus{},
-					},
-					Schema: &v1.CustomResourceValidation{
-						OpenAPIV3Schema: &v1.JSONSchemaProps{
-							Description: "StorageVersionMigration represents a migration of stored data to the latest storage version.",
-							Type:        "object",
-							Properties: map[string]v1.JSONSchemaProps{
-								"apiVersion": {
-									Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-									Type:        "string",
-								},
-								"kind": {
-									Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-									Type:        "string",
-								},
-								"metadata": {
-									Type: "object",
-								},
-								"spec": {
-									Description: "Specification of the migration.",
-									Type:        "object",
-									Required: []string{
-										"resource",
-									},
-									Properties: map[string]v1.JSONSchemaProps{
-										"continueToken": {
-											Description: "The token used in the list options to get the next chunk of objects to migrate. When the .status.conditions indicates the migration is \"Running\", users can use this token to check the progress of the migration.",
-											Type:        "string",
-										},
-										"resource": {
-											Description: "The resource that is being migrated. The migrator sends requests to the endpoint serving the resource. Immutable.",
-											Type:        "object",
-											Properties: map[string]v1.JSONSchemaProps{
-												"group": {
-													Description: "The name of the group.",
-													Type:        "string",
-												},
-												"resource": {
-													Description: "The name of the resource.",
-													Type:        "string",
-												},
-												"version": {
-													Description: "The name of the version.",
-													Type:        "string",
-												},
-											},
-										},
-									},
-								},
-								"status": {
-									Description: "Status of the migration.",
-									Type:        "object",
-									Properties: map[string]v1.JSONSchemaProps{
-										"conditions": {
-											Description: "The latest available observations of the migration's current state.",
-											Type:        "array",
-											Items: &v1.JSONSchemaPropsOrArray{
-												Schema: &v1.JSONSchemaProps{
-													Description: "Describes the state of a migration at a certain point.",
-													Type:        "object",
-													Required: []string{
-														"status",
-														"type",
-													},
-													Properties: map[string]v1.JSONSchemaProps{
-														"lastUpdateTime": {
-															Description: "The last time this condition was updated.",
-															Type:        "string",
-															Format:      "date-time",
-														},
-														"message": {
-															Description: "A human readable message indicating details about the transition.",
-															Type:        "string",
-														},
-														"reason": {
-															Description: "The reason for the condition's last transition.",
-															Type:        "string",
-														},
-														"status": {
-															Description: "Status of the condition, one of True, False, Unknown.",
-															Type:        "string",
-														},
-														"type": {
-															Description: "Type of the condition.",
-															Type:        "string",
-														},
-													},
-												},
-											},
-										},
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-		},
+	crd := &v1.CustomResourceDefinition{}
+	err := yaml.Unmarshal([]byte(migrationCRDContent), crd)
+	if err != nil {
+		panic(err)
 	}
+
+	if crd.Annotations == nil {
+		crd.Annotations = make(map[string]string)
+	}
+	crd.Annotations["api-approved.kubernetes.io"] = approval
+
+	return crd
 }
 
 func migrationForResource(resource schema.GroupVersionResource) *migrationv1alpha1.StorageVersionMigration {
