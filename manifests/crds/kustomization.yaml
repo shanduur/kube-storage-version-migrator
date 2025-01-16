@@ -3,4 +3,4 @@ resources:
 - migration.k8s.io_storageversionmigrations.yaml
 
 commonAnnotations:
-  api-approved.kubernetes.io: "unapproved, test only"
+  api-approved.kubernetes.io: "https://github.com/kubernetes/enhancements/tree/master/keps/sig-api-machinery/2330-migrating-api-objects-to-latest-storage-version"
